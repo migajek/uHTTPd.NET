@@ -85,6 +85,7 @@ namespace uHttpd
             try
             {
                 context.Response.AppendHeader(@"X-Powered-By", @"Migajek's uHttpServer");
+                context.Response.ContentType = null;                
                 foreach (var requestHandler in Handlers.OrderByDescending(x => x.Priority))
                 {
                     var handled = await requestHandler.HandleRequest(context.Request, context.Response);

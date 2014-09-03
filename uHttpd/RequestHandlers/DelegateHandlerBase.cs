@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,7 +13,7 @@ namespace uHttpd.RequestHandlers
         protected abstract object ExecuteHandler(System.Net.HttpListenerRequest request,
             System.Net.HttpListenerResponse response);
 
-        public async Task<bool> HandleRequest(System.Net.HttpListenerRequest request,
+        public async Task<bool> HandleRequest(HttpListenerRequest request,
             System.Net.HttpListenerResponse response)
         {
             var matches = UrlMatches(request.Url.AbsolutePath);
@@ -24,15 +25,14 @@ namespace uHttpd.RequestHandlers
                 response.StatusCode = 204;
             }
             else if (result is string)
-            {
-                response.StatusCode = 200;
-                response.ContentType = "text/plain";
+            {                
+                if (String.IsNullOrEmpty(response.ContentType))
+                    response.ContentType = "text/plain";
                 using (var writer = new StreamWriter(response.OutputStream))
                     await writer.WriteAsync(result as string);
             }
             else if (result is Stream)
-            {
-                response.StatusCode = 200;
+            {                
                 await (result as Stream).CopyToAsync(response.OutputStream);
             }
             else

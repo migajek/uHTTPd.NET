@@ -20,9 +20,10 @@ namespace uHttpdApp
             var http = new uHttpServer();
             http.InitDefaults(dir);
             http.Handlers.Add(new DelegateWithParamsHandler(@"^/hello,{name:\w+}$",
-                delegate(HttpListenerRequest request, Dictionary<string, string> dictionary)
+                delegate(HttpListenerRequest request,HttpListenerResponse response, Dictionary<string, string> dictionary)
                 {
-                    return String.Format("Hi there, {0}", dictionary["name"]);
+                    response.ContentType = "text/html";                    
+                    return String.Format("Hi there, <b>{0}</b>", dictionary["name"]);
                 }));
             http.ExceptionHandlers.OfType<DefaultHttpExceptionHandler>().Single().ShowStackTrace = true;
             http.Start("http://localhost:8090/");
